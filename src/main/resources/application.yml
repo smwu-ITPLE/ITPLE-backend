@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: smwu-itple
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/maeumgil
+    username: root
+    password: it2116732
+
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+server:
+  address: localhost
+  port: 8080

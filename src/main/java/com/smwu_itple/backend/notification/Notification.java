@@ -1,7 +1,5 @@
-package com.smwu_itple.backend.message;
+package com.smwu_itple.backend.notification;
 
-import com.smwu_itple.backend.attachment.Attachment;
-import com.smwu_itple.backend.chat.Chat;
 import com.smwu_itple.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,30 +7,22 @@ import lombok.Setter;
 
 @Entity
 @Getter @Setter
-@Table(name = "message")
-public class Message {
+@Table(name = "notification")
+public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "message_id")
+    @Column(name = "notification_id")
     private Long id;
 
     @Column(nullable = false)
-    private Boolean isFromSender;
+    private Boolean isRead;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "created_at")
+    @Column(nullable = false)
     private String createdAt;
-
-    @OneToOne
-    @JoinColumn(name = "attachment_id")
-    private Attachment attachment;
-
-    @ManyToOne
-    @JoinColumn(name = "chat_id")
-    private Chat chat;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

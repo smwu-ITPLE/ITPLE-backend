@@ -1,27 +1,32 @@
 package com.smwu_itple.backend.archieve;
 
+import com.smwu_itple.backend.memorial.Memorial;
 import com.smwu_itple.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
+@Getter @Setter
+@Table(name = "archieve")
 public class Archieve {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long archieveId;
+    @Column(name = "archieve_id")
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "archieve_user", nullable = false)
-    private User archieveUser; // 글쓴이
-
-    @Lob
     @Column(columnDefinition = "LONGTEXT")
-    private String archieveContent; // 편지
+    private String content;
 
     @Column(nullable = false)
-    private int archieveColor; // 1/2/3/4/5 중에서 선택
+    private String color;
+
+    @ManyToOne
+    @JoinColumn(name = "memorial_id")
+    private Memorial memorial;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

@@ -6,28 +6,28 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
+@Getter @Setter
+@Table(name = "memorial")
 public class Memorial {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long memorialId;
+    @Column(name = "memorial_id")
+    private Long id;
 
     @Column(nullable = false, length = 50)
-    private String memorialTitle; // 방제목
+    private String title;
 
     @ManyToOne
     @JoinColumn(name = "memorial_user", nullable = false)
     private User memorialUser; // 신청자
 
     @Lob
-    private byte[] memorialImage; // 이미지
+    private byte[] image;
 
     @Column(nullable = false)
-    private int memorialMask; // 1/2/3 중에서 선택
+    private String mask;
 
-    @Lob
     @Column(columnDefinition = "LONGTEXT")
-    private String memorialContent; // 관련 문구
+    private String content;
 }

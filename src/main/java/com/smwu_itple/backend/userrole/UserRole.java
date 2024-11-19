@@ -1,24 +1,26 @@
-package com.smwu_itple.backend.chat;
+package com.smwu_itple.backend.userrole;
 
 import com.smwu_itple.backend.late.Late;
-import com.smwu_itple.backend.message.Message;
-import com.smwu_itple.backend.pay.Pay;
 import com.smwu_itple.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Entity
 @Getter @Setter
-@Table(name = "chat")
-public class Chat {
+@Table(name = "user_role")
+public class UserRole {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "chat_id")
+    @Column(name = "role_id")
     private Long id;
+
+    private String roleRelation;
+
+    @Enumerated(EnumType.STRING) // EnumType.STRING: enum 값을 문자열로 저장
+    @Column(nullable = false)
+    private Authority authority;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -28,9 +30,8 @@ public class Chat {
     @JoinColumn(name = "late_id")
     private Late late;
 
-    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
-    private List<Message> messages;
-
-    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
-    private List<Pay> payments;
+    // 권한 enum 정의
+    public enum Authority {
+        OWNER, GUEST;
+    }
 }

@@ -1,24 +1,32 @@
 package com.smwu_itple.backend.pay;
 
 import com.smwu_itple.backend.chat.Chat;
+import com.smwu_itple.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
+@Getter @Setter
+@Table(name = "pay")
 public class Pay {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long payId;
+    @Column(name = "pay_id")
+    private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "pay_chat_id", nullable = false)
+    @Column(nullable = false)
+    private int money;
+
+    @ManyToOne
+    @JoinColumn(name = "chat_id")
     private Chat chat;
 
     @Column(nullable = false)
-    private boolean payEnvelope; // 0(검정), 1(회색)
+    private String envelope;
 
-    private int payMoney; // 송금액
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

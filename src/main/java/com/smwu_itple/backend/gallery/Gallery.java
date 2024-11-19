@@ -1,38 +1,33 @@
-package com.smwu_itple.backend.message;
+package com.smwu_itple.backend.gallery;
 
 import com.smwu_itple.backend.attachment.Attachment;
-import com.smwu_itple.backend.chat.Chat;
+import com.smwu_itple.backend.late.Late;
 import com.smwu_itple.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
-@Getter @Setter
-@Table(name = "message")
-public class Message {
+@Table(name = "gallery")
+public class Gallery {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "message_id")
+    @Column(name = "gallery_id")
     private Long id;
-
-    @Column(nullable = false)
-    private Boolean isFromSender;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
-
-    @Column(name = "created_at")
-    private String createdAt;
 
     @OneToOne
     @JoinColumn(name = "attachment_id")
     private Attachment attachment;
 
     @ManyToOne
-    @JoinColumn(name = "chat_id")
-    private Chat chat;
+    @JoinColumn(name = "late_id")
+    private Late late;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
