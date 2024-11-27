@@ -1,27 +1,31 @@
 package com.smwu_itple.backend.memorial;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class MemorialService {
+    private final MemorialRepository memorialRepository;
 
-    @Autowired
-    private MemorialRepository memorialRepository;
-
-    public Memorial saveMemorial(Memorial memorial) {
-        return memorialRepository.save(memorial);
+    //조문공간 생성
+    @Transactional
+    public Long createMemorial(Memorial memorial){
+        memorialRepository.save(memorial);
+        return memorial.getId();
     }
 
-    public Optional<Memorial> getMemorialById(Long id) {
-        return memorialRepository.findById(id);
-    }
-
-    public List<Memorial> getAllMemorial() {
+    //조문공간 조회
+    public List<Memorial> findMemorial(){
         return memorialRepository.findAll();
     }
 
+    public Memorial findOne(Long id){
+        return memorialRepository.findOne(id);
+    }
 }

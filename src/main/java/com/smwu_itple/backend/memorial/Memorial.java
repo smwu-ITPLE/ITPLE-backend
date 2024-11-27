@@ -19,7 +19,7 @@ public class Memorial {
     private String title;
 
     @ManyToOne
-    @JoinColumn(name = "memorial_user", nullable = false)
+    @JoinColumn(name = "memorial_user", nullable = true)
     private User memorialUser; // 신청자
 
     @Lob
