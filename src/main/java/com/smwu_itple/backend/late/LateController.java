@@ -1,10 +1,16 @@
 package com.smwu_itple.backend.late;
 
+import com.smwu_itple.backend.user.User;
+import com.smwu_itple.backend.user.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -49,7 +55,7 @@ public class LateController {
         }
     }
 
-    //특정 조문공간 조회
+    //특정 조문공간 조회 > 조문공간 정보 전달
     @GetMapping("/{id}")
     public ResponseEntity<?> getLate(@PathVariable Long id) {
         try {
@@ -71,5 +77,31 @@ public class LateController {
         }
     }
 
+    // 공유
+    @GetMapping("/{id}/share")
+    public ResponseEntity<?> ShareLate(@PathVariable Long id, HttpSession session){
+        try {
+            Late late = lateService.findOne(id);
+
+            User user = (User) session.getAttribute("user"); // 세션에 User 객체 저장된 경우
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            }
+
+            // 반환 데이터 구성
+            Map<String, Object> response = new HashMap<>();
+            response.put("name", late.getName());
+            response.put("datePass", late.getDatePass());
+            response.put("dateDeath", late.getDateDeath());
+            response.put("location", late.getLocation());
+            response.put("content", late.getContent());
+            response.put("userName", user.getName());
+            response.put("userPhonenumber", user.getPhonenumber());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("조문공간을 찾을 수 없습니다.");
+        }
+    }
 
 }

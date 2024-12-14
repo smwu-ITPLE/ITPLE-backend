@@ -1,6 +1,7 @@
 package com.smwu_itple.backend.late;
 
 import com.smwu_itple.backend.gallery.Gallery;
+import com.smwu_itple.backend.user.User;
 import com.smwu_itple.backend.userrole.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -45,8 +46,14 @@ public class Late {
     @Column(name = "created_at")
     private String createdAt;
 
-    @OneToMany(mappedBy = "late")
-    private List<UserRole> roles;
+    @ManyToMany
+    @JoinTable(
+            name = "late_owner",  // 중간 테이블을 생성하여 many-to-many 관계를 설정합니다.
+            joinColumns = @JoinColumn(name = "late_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> owners;  // Owner 정보를 List로 저장
+
 
     @OneToMany(mappedBy = "late")
     private List<Gallery> galleries;
