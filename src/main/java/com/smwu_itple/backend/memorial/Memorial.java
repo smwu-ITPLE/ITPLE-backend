@@ -1,9 +1,13 @@
 package com.smwu_itple.backend.memorial;
 
+import com.smwu_itple.backend.archieve.Archieve;
+import com.smwu_itple.backend.gallery.Gallery;
 import com.smwu_itple.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Getter @Setter
@@ -30,4 +34,7 @@ public class Memorial {
 
     @Column(columnDefinition = "LONGTEXT")
     private String content;
+
+    @OneToMany(mappedBy = "memorial")
+    private List<Archieve> archieves;
 }

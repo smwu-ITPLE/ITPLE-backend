@@ -25,7 +25,6 @@ public class User {
     @Column(unique = true, length=11)
     private String phonenumber;
 
-    @Column(nullable = false)
     private String passwd;
 
     @OneToMany(mappedBy = "user")
@@ -37,8 +36,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Message> messages;
 
-    @OneToMany(mappedBy = "user")
-    private List<Archieve> archieves;
+//    @OneToMany(mappedBy = "user")
+//    private List<Archieve> archieves;
 
 
     //getter and setter

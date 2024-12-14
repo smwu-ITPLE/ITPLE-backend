@@ -26,7 +26,7 @@ public class Archieve {
     @JoinColumn(name = "memorial_id")
     private Memorial memorial;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
 }

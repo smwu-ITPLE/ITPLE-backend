@@ -1,17 +1,22 @@
 package com.smwu_itple.backend.memorial;
 
+import com.smwu_itple.backend.archieve.Archieve;
+import com.smwu_itple.backend.archieve.ArchieveDTO;
+import com.smwu_itple.backend.archieve.ArchieveService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/memorials")
 public class MemorialController {
     private final MemorialService memorialService;
+    private final ArchieveService archieveService;
 
     // 1. 공개 추모관 생성
     @PostMapping("/create")
@@ -49,10 +54,35 @@ public class MemorialController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getMemorial(@PathVariable Long id) {
         try {
+            // Memorial 객체를 찾음
             Memorial memorial = memorialService.findOne(id);
-            return ResponseEntity.ok(memorial);
+
+            // Memorial이 없다면 404 오류 응답
+            if (memorial == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("추모관을 찾을 수 없습니다.");
+            }
+
+            // Memorial에 포함된 Archieve들을 ArchieveDTO로 변환
+            List<ArchieveDTO> archieveDTOs = memorial.getArchieves().stream()
+                    .map(archieve -> new ArchieveDTO(archieve.getId(), archieve.getContent(), archieve.getColor()))
+                    .collect(Collectors.toList());
+
+            // MemorialDto 생성
+            MemorialDto memorialDto = new MemorialDto();
+            memorialDto.setTitle(memorial.getTitle());
+            memorialDto.setContent(memorial.getContent());
+            memorialDto.setMask(memorial.getMask());
+            memorialDto.setImage(memorial.getImage());
+            memorialDto.setMemorialUser(memorial.getMemorialUser());
+            memorialDto.setArchieveDTOs(archieveDTOs);
+
+            // MemorialDto 반환
+            return ResponseEntity.ok(memorialDto);
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("추모관을 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
     }
+
+
 }

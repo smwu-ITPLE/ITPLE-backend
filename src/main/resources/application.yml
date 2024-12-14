@@ -18,5 +18,4 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
 
 server:
-  address: localhost
   port: 8080
