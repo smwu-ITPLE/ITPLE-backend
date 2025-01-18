@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter @Setter
 @Table(name = "attachment")
@@ -23,13 +25,9 @@ public class Attachment {
     private String modifiedName;
 
     @Column(name = "created_at")
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     @OneToOne
     @JoinColumn(name = "message_id")
     private Message message;
-
-    @OneToOne
-    @JoinColumn(name = "gallery_id")
-    private Gallery gallery;
 }

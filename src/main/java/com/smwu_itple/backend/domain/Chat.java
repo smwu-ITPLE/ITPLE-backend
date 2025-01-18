@@ -32,5 +32,5 @@ public class Chat {
     private List<Message> messages;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
-    private List<Pay> payments;
+    private List<Pay> pays;
 }

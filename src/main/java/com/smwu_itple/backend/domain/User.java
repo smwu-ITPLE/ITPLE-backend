@@ -24,17 +24,11 @@ public class User {
     private String passwd;
 
     @OneToMany(mappedBy = "user")
-    private List<Notification> notifications;
-
-    @OneToMany(mappedBy = "user")
     private List<UserRole> roles;
 
     @OneToMany(mappedBy = "user")
     private List<Message> messages;
 
-//    @OneToMany(mappedBy = "user")
-//    private List<Archieve> archieves;
-
-
-    //getter and setter
+    @OneToMany(mappedBy = "user")
+    private List<Archive> archives;
 }

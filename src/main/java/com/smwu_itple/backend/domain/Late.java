@@ -20,6 +20,9 @@ public class Late {
     @Column(nullable = false, length=10)
     private String name;
 
+    @Column(nullable = false)
+    private String passwd;
+
     @Lob
     private byte[] profile;
 
@@ -41,7 +44,7 @@ public class Late {
     private String content;
 
     @Column(name = "created_at")
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     @ManyToMany
     @JoinTable(
@@ -50,8 +53,4 @@ public class Late {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> owners;  // Owner 정보를 List로 저장
-
-
-    @OneToMany(mappedBy = "late")
-    private List<Gallery> galleries;
 }

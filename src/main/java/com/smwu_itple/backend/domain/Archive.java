@@ -6,25 +6,22 @@ import lombok.Setter;
 
 @Entity
 @Getter @Setter
-@Table(name = "archieve")
-public class Archieve {
+@Table(name = "archive")
+public class Archive {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "archieve_id")
+    @Column(name = "archive_id")
     private Long id;
 
     @Column(columnDefinition = "LONGTEXT")
     private String content;
 
-    @Column(nullable = false)
-    private String color;
+    @ManyToOne
+    @JoinColumn(name = "late_id")
+    private Late late;
 
     @ManyToOne
-    @JoinColumn(name = "memorial_id")
-    private Memorial memorial;
-
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
+    @JoinColumn(name = "user_id")
+    private User user;
 }
