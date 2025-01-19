@@ -1,9 +1,9 @@
-package com.smwu_itple.backend.dto;
+package com.smwu_itple.backend.dto.request;
 
 import lombok.Data;
 
 @Data
-public class LoginDto {
+public class UserLoginRequest {
     private String phonenumber;
     private String passwd;
 }

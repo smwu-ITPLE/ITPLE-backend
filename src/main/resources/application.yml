@@ -18,4 +18,12 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
 
 server:
-  port: 8081rha
+  port: 8081
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+        web: DEBUG
+        oauth2: DEBUG
