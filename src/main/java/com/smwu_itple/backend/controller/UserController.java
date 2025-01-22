@@ -8,10 +8,12 @@ import com.smwu_itple.backend.dto.response.UserProfileResponse;
 import com.smwu_itple.backend.infra.api.ApiResponse;
 import com.smwu_itple.backend.infra.api.FailureStatus;
 import com.smwu_itple.backend.infra.api.SuccessStatus;
+import com.smwu_itple.backend.infra.exception.UnauthorizedException;
 import com.smwu_itple.backend.infra.util.SessionUtil;
 import com.smwu_itple.backend.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -72,6 +74,8 @@ public class UserController {
             Long userId = SessionUtil.getUserIdFromSession(session);
             UserProfileResponse userProfileResponse = userService.getProfile(userId);
             return ApiResponse.onSuccess(userProfileResponse, SuccessStatus._GET_USER_PROFILE_SUCCESS);
+        } catch (UnauthorizedException e) {
+            return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
         } catch (Exception e) {
             return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
         }

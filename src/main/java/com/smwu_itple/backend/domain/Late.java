@@ -24,13 +24,13 @@ public class Late {
     private String passwd;
 
     @Lob
-    private byte[] profile;
+    private String profile;
 
     @Column(nullable=false)
     private int age;
 
     @Column(nullable=false)
-    private boolean gender; // true: male, false: female
+    private String gender;
 
     @Column(nullable=false, name = "date_pass")
     private LocalDateTime datePass; //별세일
@@ -43,14 +43,6 @@ public class Late {
     @Column(columnDefinition = "LONGTEXT")
     private String content;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @ManyToMany
-    @JoinTable(
-            name = "late_owner",  // 중간 테이블을 생성하여 many-to-many 관계를 설정합니다.
-            joinColumns = @JoinColumn(name = "late_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> owners;  // Owner 정보를 List로 저장
+    @OneToMany(mappedBy = "late", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Owner> owners; // 상주 정보
 }
