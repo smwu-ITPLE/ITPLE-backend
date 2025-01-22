@@ -23,8 +23,8 @@ public class User {
 
     private String passwd;
 
-    @OneToMany(mappedBy = "user")
-    private List<UserRole> roles;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Owner> owners;
 
     @OneToMany(mappedBy = "user")
     private List<Message> messages;

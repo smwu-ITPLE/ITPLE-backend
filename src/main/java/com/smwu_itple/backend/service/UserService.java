@@ -1,13 +1,18 @@
 package com.smwu_itple.backend.service;
 
 import com.smwu_itple.backend.domain.User;
+import com.smwu_itple.backend.dto.request.UserLoginRequest;
+import com.smwu_itple.backend.dto.request.UserSignupRequest;
+import com.smwu_itple.backend.dto.response.UserLoginResponse;
+import com.smwu_itple.backend.dto.response.UserProfileResponse;
 import com.smwu_itple.backend.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
+
 
 @Service
 @Transactional(readOnly = true)
@@ -17,41 +22,53 @@ public class UserService {
 
     //회원가입
     @Transactional
-    public Long join(User user){
-        validateDuplicateUser(user); //중복회원 검증
+    public void join(UserSignupRequest userSignupRequest) {
+        User user = new User();
+        user.setName(userSignupRequest.getName());
+        user.setPhonenumber(userSignupRequest.getPhonenumber());
+        user.setPasswd(userSignupRequest.getPasswd());
+        validateDuplicateUser(user);
         userRepository.save(user);
-        return user.getId();
     }
 
-    private void validateDuplicateUser(User user){
-        Optional<User> optionalUser = userRepository.findByPhone(user.getPhonenumber());
-        // 전화번호가 이미 존재하면 예외를 발생시킴
-        optionalUser.ifPresent(u -> {
+    // 중복 회원 검증
+    private void validateDuplicateUser(User user) {
+        if (userRepository.findByPhonenumber(user.getPhonenumber()).isPresent()) {
             throw new IllegalStateException("이미 존재하는 전화번호입니다.");
-        });
-     }
+        }
+    }
 
     //로그인
-    public User login(String phonenumber, String passwd){
-        Optional<User> optionalUser = userRepository.findByPhone(phonenumber);
+    public UserLoginResponse login(UserLoginRequest userLoginRequest, HttpSession session) {
+        User user = userRepository.findByPhonenumberAndPasswd(
+                userLoginRequest.getPhonenumber(), userLoginRequest.getPasswd()
+        ).orElseThrow(() -> new IllegalStateException("전화번호 또는 비밀번호가 올바르지 않습니다."));
 
-        // 유저가 없거나 비밀번호가 일치하지 않는 경우 예외 발생
-        User user = optionalUser.orElseThrow(() ->
-                new IllegalStateException("전화번호 또는 비밀번호가 올바르지 않습니다."));
+        // 세션에 사용자 ID 저장
+        session.setAttribute("userId", user.getId());
 
-        if (!user.getPasswd().equals(passwd)) {
-            throw new IllegalStateException("전화번호 또는 비밀번호가 올바르지 않습니다.");
+        // UserLoginResponse 생성 및 반환
+        return new UserLoginResponse(user.getId(), user.getName(), user.getPhonenumber());
+    }
+
+    // 로그아웃
+    @Transactional
+    public boolean logout(HttpSession session) {
+        if (session.getAttribute("userId") != null) {
+            session.invalidate();
+            return true;
         }
-
-        return user; // 로그인 성공 시 사용자 반환
+        return false;
     }
 
-    //회원 조회
-    public List<User> findUsers(){
-        return userRepository.findAll();
+    // 사용자 조회
+    public UserProfileResponse getProfile(Long userId) {
+        User user =  findUserByIdOrThrow(userId);
+        return new UserProfileResponse(user.getName());
     }
 
-    public User findOne(Long id){
-        return userRepository.findOne(id);
+    public User findUserByIdOrThrow(Long userId){
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 }
