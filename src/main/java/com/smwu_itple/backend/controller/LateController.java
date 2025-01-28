@@ -1,6 +1,7 @@
 package com.smwu_itple.backend.controller;
 
 import com.smwu_itple.backend.domain.Late;
+import com.smwu_itple.backend.dto.ArchiveDto;
 import com.smwu_itple.backend.dto.request.LateCreateRequest;
 import com.smwu_itple.backend.dto.request.LateSearchRequest;
 import com.smwu_itple.backend.dto.response.LateCreateResponse;
@@ -94,6 +95,17 @@ public class LateController {
         } catch (UnauthorizedException e) {
             return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
         } catch (Exception e) {
+            return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
+        }
+    }
+
+    //아카이브 작성
+    @PostMapping("/{lateId}/archive")
+    public ResponseEntity<?> createArchive(@PathVariable Long lateId, @RequestBody ArchiveDto archiveRequest) {
+        try {
+            ArchiveDto response = lateService.createArchive(lateId, archiveRequest);
+            return ApiResponse.onSuccess(response, SuccessStatus._GET_LATE_SUCCESS);
+        } catch (IllegalArgumentException e) {
             return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
         }
     }

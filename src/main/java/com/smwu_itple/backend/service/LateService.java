@@ -1,14 +1,17 @@
 package com.smwu_itple.backend.service;
 
+import com.smwu_itple.backend.domain.Archive;
 import com.smwu_itple.backend.domain.Late;
 import com.smwu_itple.backend.domain.Owner;
 import com.smwu_itple.backend.domain.User;
+import com.smwu_itple.backend.dto.ArchiveDto;
 import com.smwu_itple.backend.dto.request.LateCreateRequest;
 import com.smwu_itple.backend.dto.request.LateSearchRequest;
 import com.smwu_itple.backend.dto.response.LateCreateResponse;
 import com.smwu_itple.backend.dto.response.LateGetResponse;
-import com.smwu_itple.backend.dto.request.OwnerResponse;
+import com.smwu_itple.backend.dto.OwnerDto;
 import com.smwu_itple.backend.dto.response.LateShareResponse;
+import com.smwu_itple.backend.repository.ArchiveRepository;
 import com.smwu_itple.backend.repository.LateRepository;
 import com.smwu_itple.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
 public class LateService {
     private final LateRepository lateRepository;
     private final UserRepository userRepository;
+    private final ArchiveRepository archiveRepository;
 
     // 랜덤 비밀번호 생성
     private String generateRandomPassword() {
@@ -116,11 +120,18 @@ public class LateService {
         Late late = findLateByIdOrThrow(lateId);
 
         // Owner를 OwnerResponse로 변환
-        List<OwnerResponse> ownerResponse = late.getOwners().stream()
-                .map(owner -> new OwnerResponse(
+        List<OwnerDto> ownerDto = late.getOwners().stream()
+                .map(owner -> new OwnerDto(
                         owner.getName(),
                         owner.getRelation(),
                         owner.getPhoneNumber()
+                ))
+                .collect(Collectors.toList());
+
+        List<ArchiveDto> archiveDto = late.getArchives().stream()
+                .map(archive -> new ArchiveDto(
+                        archive.getNickname(),
+                        archive.getContent()
                 ))
                 .collect(Collectors.toList());
 
@@ -134,7 +145,8 @@ public class LateService {
                 late.getDatePass(),
                 late.getDateDeath(),
                 late.getLocation(),
-                ownerResponse
+                ownerDto,
+                archiveDto
         );
     }
 
@@ -155,5 +167,20 @@ public class LateService {
     public Late findLateByIdOrThrow(Long lateId) {
         return lateRepository.findById(lateId)
                 .orElseThrow(() -> new IllegalArgumentException("조문공간이 존재하지 않습니다."));
+    }
+
+    @Transactional
+    public ArchiveDto createArchive(Long lateId, ArchiveDto archiveRequest){
+        Late late = findLateByIdOrThrow(lateId);
+        Archive archive = new Archive();
+        archive.setNickname(archiveRequest.getNickname());
+        archive.setContent(archiveRequest.getContent());
+        archive.setLate(late);
+
+        archiveRepository.save(archive);
+        return new ArchiveDto(
+                archive.getNickname(),
+                archive.getContent()
+        );
     }
 }

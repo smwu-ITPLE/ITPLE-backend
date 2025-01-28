@@ -1,6 +1,7 @@
 package com.smwu_itple.backend.dto.response;
 
-import com.smwu_itple.backend.dto.request.OwnerResponse;
+import com.smwu_itple.backend.dto.ArchiveDto;
+import com.smwu_itple.backend.dto.OwnerDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,5 +20,6 @@ public class LateGetResponse {
     private LocalDateTime datePass; // 별세일 날짜
     private LocalDateTime dateDeath; // 발인 날짜
     private String location;
-    private List<OwnerResponse> owners; // 여러 명의 상주 정보를 포함
+    private List<OwnerDto> owners;
+    private List<ArchiveDto> archives;
 }

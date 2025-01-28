@@ -28,7 +28,4 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Message> messages;
-
-    @OneToMany(mappedBy = "user")
-    private List<Archive> archives;
 }
