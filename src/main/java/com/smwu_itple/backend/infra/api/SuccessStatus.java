@@ -11,7 +11,8 @@ public enum SuccessStatus {
     _GET_LATE_SUCCESS("조문공간 조회 성공"),
     _GET_LATE_SHARE_SUCCESS("조문공간 공유 성공"),
     _GET_USER_LATELIST_SUCCESS("사용자가 상주로 포함된 조문공간 조회 성공"),
-    _GET_LATEOWNER_SUCCESS("조문공간 상주 조회 성공");
+    _GET_LATEOWNER_SUCCESS("조문공간 상주 조회 성공"),
+    _POST_ARCHIVE_CREATE_SUCCESS("조문공간 아카이브 생성 성공");
 
     private final String message;
 

@@ -117,7 +117,7 @@ public class LateController {
     public ResponseEntity<ApiResponse> createArchive(@PathVariable Long lateId, @RequestBody ArchiveDto archiveRequest) {
         try {
             ArchiveDto response = lateService.createArchive(lateId, archiveRequest);
-            return ApiResponse.onSuccess(response, SuccessStatus._GET_LATE_SUCCESS);
+            return ApiResponse.onSuccess(response, SuccessStatus._POST_ARCHIVE_CREATE_SUCCESS);
         } catch (IllegalArgumentException e) {
             return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
         }
