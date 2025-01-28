@@ -14,14 +14,12 @@ public class Archive {
     @Column(name = "archive_id")
     private Long id;
 
+    private String nickname;
+
     @Column(columnDefinition = "LONGTEXT")
     private String content;
 
     @ManyToOne
     @JoinColumn(name = "late_id")
     private Late late;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 }

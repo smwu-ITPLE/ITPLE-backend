@@ -45,4 +45,7 @@ public class Late {
 
     @OneToMany(mappedBy = "late", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Owner> owners; // 상주 정보
+
+    @OneToMany(mappedBy = "late", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Archive> archives; // 아카이브 정보
 }
