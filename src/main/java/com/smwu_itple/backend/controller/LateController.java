@@ -101,7 +101,7 @@ public class LateController {
 
     //아카이브 작성
     @PostMapping("/{lateId}/archive")
-    public ResponseEntity<?> createArchive(@PathVariable Long lateId, @RequestBody ArchiveDto archiveRequest) {
+    public ResponseEntity<ApiResponse> createArchive(@PathVariable Long lateId, @RequestBody ArchiveDto archiveRequest) {
         try {
             ArchiveDto response = lateService.createArchive(lateId, archiveRequest);
             return ApiResponse.onSuccess(response, SuccessStatus._GET_LATE_SUCCESS);

@@ -3,6 +3,7 @@ package com.smwu_itple.backend.controller;
 import com.smwu_itple.backend.domain.User;
 import com.smwu_itple.backend.dto.request.UserLoginRequest;
 import com.smwu_itple.backend.dto.request.UserSignupRequest;
+import com.smwu_itple.backend.dto.response.LateSimpleResponse;
 import com.smwu_itple.backend.dto.response.UserLoginResponse;
 import com.smwu_itple.backend.dto.response.UserProfileResponse;
 import com.smwu_itple.backend.infra.api.ApiResponse;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -74,6 +76,20 @@ public class UserController {
             Long userId = SessionUtil.getUserIdFromSession(session);
             UserProfileResponse userProfileResponse = userService.getProfile(userId);
             return ApiResponse.onSuccess(userProfileResponse, SuccessStatus._GET_USER_PROFILE_SUCCESS);
+        } catch (UnauthorizedException e) {
+            return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
+        } catch (Exception e) {
+            return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
+        }
+    }
+
+    //상주로 있는 조문공간 리스트
+    @GetMapping("/latelist")
+    public ResponseEntity<ApiResponse> getLatelist(HttpSession session){
+        try {
+            Long userId = SessionUtil.getUserIdFromSession(session);
+            List<LateSimpleResponse> Response = userService.getLatelist(userId);
+            return ApiResponse.onSuccess(Response, SuccessStatus._GET_USER_LATELIST_SUCCESS);
         } catch (UnauthorizedException e) {
             return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
         } catch (Exception e) {
