@@ -6,6 +6,7 @@ import com.smwu_itple.backend.dto.request.LateCreateRequest;
 import com.smwu_itple.backend.dto.request.LateSearchRequest;
 import com.smwu_itple.backend.dto.response.LateCreateResponse;
 import com.smwu_itple.backend.dto.response.LateGetResponse;
+import com.smwu_itple.backend.dto.response.LateOwnerResponse;
 import com.smwu_itple.backend.dto.response.LateShareResponse;
 import com.smwu_itple.backend.infra.api.ApiResponse;
 import com.smwu_itple.backend.infra.api.FailureStatus;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -95,6 +97,17 @@ public class LateController {
         } catch (UnauthorizedException e) {
             return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
         } catch (Exception e) {
+            return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
+        }
+    }
+
+    //채팅할 수 있는 상주 조회
+    @GetMapping("/{lateId}/lateowner")
+    public ResponseEntity<ApiResponse> getLateOwner(@PathVariable Long lateId) {
+        try {
+            List<LateOwnerResponse> response = lateService.getLateOwner(lateId);
+            return ApiResponse.onSuccess(response, SuccessStatus._GET_LATEOWNER_SUCCESS);
+        } catch (IllegalArgumentException e) {
             return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
         }
     }
