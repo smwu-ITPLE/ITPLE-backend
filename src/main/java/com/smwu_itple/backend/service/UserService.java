@@ -1,17 +1,21 @@
 package com.smwu_itple.backend.service;
 
+import com.smwu_itple.backend.domain.Owner;
 import com.smwu_itple.backend.domain.User;
 import com.smwu_itple.backend.dto.request.UserLoginRequest;
 import com.smwu_itple.backend.dto.request.UserSignupRequest;
+import com.smwu_itple.backend.dto.response.LateSimpleResponse;
 import com.smwu_itple.backend.dto.response.UserLoginResponse;
 import com.smwu_itple.backend.dto.response.UserProfileResponse;
+import com.smwu_itple.backend.repository.OwnerRepository;
 import com.smwu_itple.backend.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -19,6 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final OwnerRepository ownerRepository;
 
     //회원가입
     @Transactional
@@ -65,6 +70,13 @@ public class UserService {
     public UserProfileResponse getProfile(Long userId) {
         User user =  findUserByIdOrThrow(userId);
         return new UserProfileResponse(user.getName());
+    }
+
+    public List<LateSimpleResponse> getLatelist(Long userId){
+        List<Owner> owners = ownerRepository.findByUserId(userId);
+        return owners.stream()
+                .map(owner -> new LateSimpleResponse(owner.getLate().getId(), owner.getLate().getName()))
+                .collect(Collectors.toList());
     }
 
     public User findUserByIdOrThrow(Long userId){
