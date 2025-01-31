@@ -17,6 +17,10 @@ public class Pay {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "late_id")
+    private Late late;
+
+    @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
 

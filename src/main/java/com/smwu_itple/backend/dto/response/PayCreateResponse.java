@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 public class PayCreateResponse {
-    private Long lateId;
     private String senderName;
     private String receiverName;
     private Integer envelope;
