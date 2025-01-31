@@ -4,7 +4,6 @@ import com.smwu_itple.backend.domain.*;
 import com.smwu_itple.backend.dto.request.MessageCreateRequest;
 import com.smwu_itple.backend.dto.response.MessageCreateResponse;
 import com.smwu_itple.backend.repository.MessageRepository;
-import com.smwu_itple.backend.repository.OwnerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class MessageService {
+public class CondolenceService {
     private final MessageRepository messageRepository;
 
     private final LateService lateService;
