@@ -5,6 +5,7 @@ import com.smwu_itple.backend.dto.request.MessageCreateRequest;
 import com.smwu_itple.backend.dto.request.PayCreateRequest;
 import com.smwu_itple.backend.dto.response.MessageCreateResponse;
 import com.smwu_itple.backend.dto.response.PayCreateResponse;
+import com.smwu_itple.backend.dto.response.PaySumResponse;
 import com.smwu_itple.backend.repository.MessageRepository;
 import com.smwu_itple.backend.repository.PayRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -113,4 +115,32 @@ public class CondolenceService {
                 .collect(Collectors.toList());
     }
 
+    public List<PaySumResponse> getPaySum(Long lateId){
+        Late late = lateService.findLateByIdOrThrow(lateId);
+        List<Pay> pays = payRepository.findByLate(late);
+
+        //전체 부의금
+        double totalAmount = pays.stream()
+                .mapToDouble(Pay::getAmount)
+                .sum();
+
+        Map<Owner, Integer> ownerTotalMap = pays.stream()
+                .collect(Collectors.groupingBy(
+                        Pay::getReceiver,
+                        Collectors.summingInt(Pay::getAmount)
+                ));
+
+        return ownerTotalMap.entrySet().stream()
+                .map(entry -> {
+                    Owner owner = entry.getKey();
+                    Integer ownerTotal = entry.getValue();
+                    double percentage = totalAmount > 0 ? (ownerTotal / totalAmount) * 100 : 0; // 퍼센트 계산
+                    return new PaySumResponse(
+                            owner.getUser().getName(),
+                            ownerTotal,
+                            percentage
+                    );
+                })
+                .collect(Collectors.toList());
+    }
 }

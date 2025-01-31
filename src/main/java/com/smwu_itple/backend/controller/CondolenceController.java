@@ -2,9 +2,7 @@ package com.smwu_itple.backend.controller;
 
 import com.smwu_itple.backend.dto.request.MessageCreateRequest;
 import com.smwu_itple.backend.dto.request.PayCreateRequest;
-import com.smwu_itple.backend.dto.response.LateOwnerResponse;
-import com.smwu_itple.backend.dto.response.MessageCreateResponse;
-import com.smwu_itple.backend.dto.response.PayCreateResponse;
+import com.smwu_itple.backend.dto.response.*;
 import com.smwu_itple.backend.infra.api.ApiResponse;
 import com.smwu_itple.backend.infra.api.FailureStatus;
 import com.smwu_itple.backend.infra.api.SuccessStatus;
@@ -71,7 +69,10 @@ public class CondolenceController {
     @GetMapping(value = "/manage/pay")
     public ResponseEntity<ApiResponse> ManagePay(@PathVariable Long lateId) {
         try {
-            List<PayCreateResponse> response = condolenceService.getPayList(lateId);
+            List<PaySumResponse> paySumResponse = condolenceService.getPaySum(lateId);
+            List<PayCreateResponse> payCreateResponse = condolenceService.getPayList(lateId);
+            PayListResponse response = new PayListResponse(paySumResponse, payCreateResponse);
+
             return ApiResponse.onSuccess(response, SuccessStatus._GET_PAYLIST_SUCCESS);
         } catch (Exception e) {
             return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
