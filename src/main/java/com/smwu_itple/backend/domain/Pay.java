@@ -22,13 +22,13 @@ public class Pay {
 
     @ManyToOne
     @JoinColumn(name = "receiver_id", nullable = false)
-    private User receiver;
+    private Owner receiver;
 
     @Column(nullable = false)
-    private String envelope;
+    private Integer envelope;
 
     @Column(nullable = false)
-    private Double amount;
+    private Integer amount;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

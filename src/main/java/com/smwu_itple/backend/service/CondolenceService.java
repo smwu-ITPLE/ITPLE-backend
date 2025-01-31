@@ -2,9 +2,11 @@ package com.smwu_itple.backend.service;
 
 import com.smwu_itple.backend.domain.*;
 import com.smwu_itple.backend.dto.request.MessageCreateRequest;
+import com.smwu_itple.backend.dto.request.PayCreateRequest;
 import com.smwu_itple.backend.dto.response.MessageCreateResponse;
+import com.smwu_itple.backend.dto.response.PayCreateResponse;
 import com.smwu_itple.backend.repository.MessageRepository;
-import com.smwu_itple.backend.repository.OwnerRepository;
+import com.smwu_itple.backend.repository.PayRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +18,9 @@ import java.time.LocalDateTime;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class MessageService {
+public class CondolenceService {
     private final MessageRepository messageRepository;
+    private final PayRepository payRepository;
 
     private final LateService lateService;
     private final UserService userService;
@@ -51,6 +54,30 @@ public class MessageService {
                 message.getContent(),
                 message.getAttachment(),
                 message.getCreatedAt()
+        );
+    }
+
+    @Transactional
+    public PayCreateResponse createPay(Long lateId, Long senderId, PayCreateRequest payCreateRequest) throws IOException {
+        Late late = lateService.findLateByIdOrThrow(lateId);
+        User sender = userService.findUserByIdOrThrow(senderId);
+        Owner receiver = ownerService.findOwnerByIdOrThrow(payCreateRequest.getReceiverId());
+
+        Pay pay = new Pay();
+        pay.setSender(sender);
+        pay.setReceiver(receiver);
+        pay.setEnvelope(payCreateRequest.getEnvelope());
+        pay.setAmount(payCreateRequest.getAmount());
+        pay.setCreatedAt(LocalDateTime.now());
+
+        payRepository.save(pay);
+        return new PayCreateResponse(
+                lateId,
+                sender.getName(),
+                receiver.getName(),
+                pay.getEnvelope(),
+                pay.getAmount(),
+                pay.getCreatedAt()
         );
     }
 }

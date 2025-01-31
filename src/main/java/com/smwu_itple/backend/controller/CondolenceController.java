@@ -1,15 +1,15 @@
 package com.smwu_itple.backend.controller;
 
-import com.smwu_itple.backend.dto.ArchiveDto;
 import com.smwu_itple.backend.dto.request.MessageCreateRequest;
-import com.smwu_itple.backend.dto.response.LateShareResponse;
+import com.smwu_itple.backend.dto.request.PayCreateRequest;
 import com.smwu_itple.backend.dto.response.MessageCreateResponse;
+import com.smwu_itple.backend.dto.response.PayCreateResponse;
 import com.smwu_itple.backend.infra.api.ApiResponse;
 import com.smwu_itple.backend.infra.api.FailureStatus;
 import com.smwu_itple.backend.infra.api.SuccessStatus;
 import com.smwu_itple.backend.infra.exception.UnauthorizedException;
 import com.smwu_itple.backend.infra.util.SessionUtil;
-import com.smwu_itple.backend.service.MessageService;
+import com.smwu_itple.backend.service.CondolenceService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -21,8 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/lates/{lateId}")
-public class MessageController {
-    private final MessageService messageService;
+public class CondolenceController {
+    private final CondolenceService condolenceService;
 
     @PostMapping(value = "/message", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse> createMessage(@PathVariable Long lateId,
@@ -31,8 +31,23 @@ public class MessageController {
                                                      HttpSession session) {
         try {
             Long senderId = SessionUtil.getUserIdFromSession(session);
-            MessageCreateResponse response = messageService.createMessage(lateId, senderId, attachment, messagecreateRequest);
+            MessageCreateResponse response = condolenceService.createMessage(lateId, senderId, attachment, messagecreateRequest);
             return ApiResponse.onSuccess(response, SuccessStatus._POST_MESSAGE_CREATE_SUCCESS);
+        } catch (UnauthorizedException e) {
+            return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
+        } catch (Exception e) {
+            return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
+        }
+    }
+
+    @PostMapping(value = "/pay")
+    public ResponseEntity<ApiResponse> CreatePay(@PathVariable Long lateId,
+                                                 @RequestBody PayCreateRequest paycreateRequest,
+                                                 HttpSession session){
+        try {
+            Long senderId = SessionUtil.getUserIdFromSession(session);
+            PayCreateResponse response = condolenceService.createPay(lateId, senderId, paycreateRequest);
+            return ApiResponse.onSuccess(response, SuccessStatus._POST_PAY_CREATE_SUCCESS);
         } catch (UnauthorizedException e) {
             return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
         } catch (Exception e) {

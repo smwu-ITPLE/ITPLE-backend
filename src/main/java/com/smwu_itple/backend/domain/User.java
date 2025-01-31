@@ -28,4 +28,7 @@ public class User {
 
     @OneToMany(mappedBy = "sender")
     private List<Message> messages;
+
+    @OneToMany(mappedBy = "sender")
+    private List<Pay> pays;
 }
