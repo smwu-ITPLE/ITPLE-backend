@@ -26,6 +26,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Owner> owners;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "sender")
     private List<Message> messages;
 }

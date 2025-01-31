@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -29,4 +31,7 @@ public class Owner {
     @ManyToOne
     @JoinColumn(name = "late_id") // 외래 키 설정
     private Late late;
+
+    @OneToMany(mappedBy = "receiver")
+    private List<Message> messages;
 }

@@ -10,6 +10,7 @@ import com.smwu_itple.backend.dto.request.LateSearchRequest;
 import com.smwu_itple.backend.dto.response.LateCreateResponse;
 import com.smwu_itple.backend.dto.response.LateGetResponse;
 import com.smwu_itple.backend.dto.OwnerDto;
+import com.smwu_itple.backend.dto.response.LateOwnerResponse;
 import com.smwu_itple.backend.dto.response.LateShareResponse;
 import com.smwu_itple.backend.repository.ArchiveRepository;
 import com.smwu_itple.backend.repository.LateRepository;
@@ -71,7 +72,7 @@ public class LateService {
 
 
     // 프로필 파일 저장
-    private String saveProfileFile(MultipartFile profileFile) throws IOException {
+    protected String saveProfileFile(MultipartFile profileFile) throws IOException {
         // 파일이 비어 있는지 확인
         if (profileFile == null || profileFile.isEmpty()) {
             return null; // 프로필 파일이 없으면 null 반환
@@ -172,6 +173,16 @@ public class LateService {
     public Late findLateByIdOrThrow(Long lateId) {
         return lateRepository.findById(lateId)
                 .orElseThrow(() -> new IllegalArgumentException("조문공간이 존재하지 않습니다."));
+    }
+
+    public List<LateOwnerResponse> getLateOwner(Long lateId) {
+        Late late = findLateByIdOrThrow(lateId);
+
+        List<LateOwnerResponse> lateOwnerResponses = late.getOwners().stream()
+                .map(owner -> new LateOwnerResponse(owner.getId(), owner.getName()))
+                .collect(Collectors.toList());
+
+        return lateOwnerResponses;
     }
 
     @Transactional

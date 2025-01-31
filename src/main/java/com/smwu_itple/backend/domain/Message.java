@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter @Setter
 @Table(name = "message")
@@ -14,24 +16,24 @@ public class Message {
     @Column(name = "message_id")
     private Long id;
 
-    @Column(nullable = false)
-    private Boolean isFromSender;
+    @ManyToOne
+    @JoinColumn(name = "late_id")
+    private Late late;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @ManyToOne
+    @JoinColumn(name = "sender_id", nullable = false)
+    private User sender;
+
+    @ManyToOne
+    @JoinColumn(name = "receiver_id", nullable = false)
+    private Owner receiver;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "created_at")
-    private String createdAt;
+    @Lob
+    private String attachment;
 
-    @OneToOne
-    @JoinColumn(name = "attachment_id")
-    private Attachment attachment;
-
-    @ManyToOne
-    @JoinColumn(name = "chat_id")
-    private Chat chat;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 }
