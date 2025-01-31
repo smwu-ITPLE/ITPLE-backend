@@ -1,9 +1,9 @@
 package com.smwu_itple.backend.controller;
 
-import com.smwu_itple.backend.dto.ArchiveDto;
 import com.smwu_itple.backend.dto.request.MessageCreateRequest;
-import com.smwu_itple.backend.dto.response.LateShareResponse;
+import com.smwu_itple.backend.dto.request.PayCreateRequest;
 import com.smwu_itple.backend.dto.response.MessageCreateResponse;
+import com.smwu_itple.backend.dto.response.PayCreateResponse;
 import com.smwu_itple.backend.infra.api.ApiResponse;
 import com.smwu_itple.backend.infra.api.FailureStatus;
 import com.smwu_itple.backend.infra.api.SuccessStatus;
@@ -33,6 +33,21 @@ public class CondolenceController {
             Long senderId = SessionUtil.getUserIdFromSession(session);
             MessageCreateResponse response = condolenceService.createMessage(lateId, senderId, attachment, messagecreateRequest);
             return ApiResponse.onSuccess(response, SuccessStatus._POST_MESSAGE_CREATE_SUCCESS);
+        } catch (UnauthorizedException e) {
+            return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
+        } catch (Exception e) {
+            return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
+        }
+    }
+
+    @PostMapping(value = "/pay")
+    public ResponseEntity<ApiResponse> CreatePay(@PathVariable Long lateId,
+                                                 @RequestBody PayCreateRequest paycreateRequest,
+                                                 HttpSession session){
+        try {
+            Long senderId = SessionUtil.getUserIdFromSession(session);
+            PayCreateResponse response = condolenceService.createPay(lateId, senderId, paycreateRequest);
+            return ApiResponse.onSuccess(response, SuccessStatus._POST_PAY_CREATE_SUCCESS);
         } catch (UnauthorizedException e) {
             return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
         } catch (Exception e) {
