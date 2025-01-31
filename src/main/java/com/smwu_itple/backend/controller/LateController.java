@@ -4,16 +4,16 @@ import com.smwu_itple.backend.domain.Late;
 import com.smwu_itple.backend.dto.ArchiveDto;
 import com.smwu_itple.backend.dto.request.LateCreateRequest;
 import com.smwu_itple.backend.dto.request.LateSearchRequest;
-import com.smwu_itple.backend.dto.response.LateCreateResponse;
-import com.smwu_itple.backend.dto.response.LateGetResponse;
-import com.smwu_itple.backend.dto.response.LateOwnerResponse;
-import com.smwu_itple.backend.dto.response.LateShareResponse;
+import com.smwu_itple.backend.dto.request.MessageCreateRequest;
+import com.smwu_itple.backend.dto.request.PayCreateRequest;
+import com.smwu_itple.backend.dto.response.*;
 import com.smwu_itple.backend.infra.api.ApiResponse;
 import com.smwu_itple.backend.infra.api.FailureStatus;
 import com.smwu_itple.backend.infra.api.SuccessStatus;
 import com.smwu_itple.backend.infra.exception.UnauthorizedException;
 import com.smwu_itple.backend.infra.util.SessionUtil;
 import com.smwu_itple.backend.service.LateService;
+import com.smwu_itple.backend.service.ManageService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -30,6 +30,8 @@ import java.util.Map;
 @RequestMapping("/api/lates")
 public class LateController {
     private final LateService lateService;
+    private final ManageService manageService;
+
     // 조문공간 생성
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse> createLate(
@@ -87,20 +89,6 @@ public class LateController {
         }
     }
 
-    //특정 조문공간 공유
-    @GetMapping("/share/{lateId}")
-    public ResponseEntity<ApiResponse> shareLate(@PathVariable Long lateId, HttpSession session){
-        try {
-            Long userId = SessionUtil.getUserIdFromSession(session);
-            LateShareResponse response = lateService.shareLate(lateId, userId);
-            return ApiResponse.onSuccess(response, SuccessStatus._GET_LATE_SHARE_SUCCESS);
-        } catch (UnauthorizedException e) {
-            return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
-        } catch (Exception e) {
-            return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
-        }
-    }
-
     //채팅할 수 있는 상주 조회
     @GetMapping("/{lateId}/lateowner")
     public ResponseEntity<ApiResponse> getLateOwner(@PathVariable Long lateId) {
@@ -108,6 +96,37 @@ public class LateController {
             List<LateOwnerResponse> response = lateService.getLateOwner(lateId);
             return ApiResponse.onSuccess(response, SuccessStatus._GET_LATEOWNER_SUCCESS);
         } catch (IllegalArgumentException e) {
+            return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
+        }
+    }
+
+    @PostMapping(value = "/{lateId}/message", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse> createMessage(@PathVariable Long lateId,
+                                                     @RequestPart(value = "attachment", required = false) MultipartFile attachment, // 사진 파일
+                                                     @RequestPart("data") MessageCreateRequest messagecreateRequest,
+                                                     HttpSession session) {
+        try {
+            Long senderId = SessionUtil.getUserIdFromSession(session);
+            MessageCreateResponse response = manageService.createMessage(lateId, senderId, attachment, messagecreateRequest);
+            return ApiResponse.onSuccess(response, SuccessStatus._POST_MESSAGE_CREATE_SUCCESS);
+        } catch (UnauthorizedException e) {
+            return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
+        } catch (Exception e) {
+            return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{lateId}/pay")
+    public ResponseEntity<ApiResponse> CreatePay(@PathVariable Long lateId,
+                                                 @RequestBody PayCreateRequest paycreateRequest,
+                                                 HttpSession session){
+        try {
+            Long senderId = SessionUtil.getUserIdFromSession(session);
+            PayCreateResponse response = manageService.createPay(lateId, senderId, paycreateRequest);
+            return ApiResponse.onSuccess(response, SuccessStatus._POST_PAY_CREATE_SUCCESS);
+        } catch (UnauthorizedException e) {
+            return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
+        } catch (Exception e) {
             return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
         }
     }
