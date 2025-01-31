@@ -32,9 +32,9 @@ public class Owner {
     @JoinColumn(name = "late_id") // 외래 키 설정
     private Late late;
 
-    @OneToMany(mappedBy = "receiver")
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages;
 
-    @OneToMany(mappedBy = "receiver")
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pay> pays;
 }
