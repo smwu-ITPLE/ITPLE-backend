@@ -82,20 +82,4 @@ public class UserController {
             return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
         }
     }
-
-    //상주로 있는 조문공간 리스트
-    @GetMapping("/latelist")
-    public ResponseEntity<ApiResponse> getLatelist(HttpSession session){
-        try {
-            Long userId = SessionUtil.getUserIdFromSession(session);
-            List<LateSimpleResponse> Response = userService.getLatelist(userId);
-            return ApiResponse.onSuccess(Response, SuccessStatus._GET_USER_LATELIST_SUCCESS);
-        } catch (UnauthorizedException e) {
-            return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
-        } catch (Exception e) {
-            return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
-        }
-    }
-
-
 }
