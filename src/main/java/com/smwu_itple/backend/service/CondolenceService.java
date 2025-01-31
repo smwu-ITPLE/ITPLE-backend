@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,6 +38,7 @@ public class CondolenceService {
         String profilePath = lateService.saveProfileFile(attachment);
 
         Message message = new Message();
+        message.setLate(late);
         message.setSender(sender);
         message.setReceiver(receiver);
         message.setCreatedAt(LocalDateTime.now());
@@ -63,6 +66,7 @@ public class CondolenceService {
         Owner receiver = ownerService.findOwnerByIdOrThrow(payCreateRequest.getReceiverId());
 
         Pay pay = new Pay();
+        pay.setLate(late);
         pay.setSender(sender);
         pay.setReceiver(receiver);
         pay.setEnvelope(payCreateRequest.getEnvelope());
@@ -78,4 +82,35 @@ public class CondolenceService {
                 pay.getCreatedAt()
         );
     }
+
+    public List<MessageCreateResponse> getMessageList(Long lateId) {
+        Late late = lateService.findLateByIdOrThrow(lateId);
+        List<Message> messages = messageRepository.findByLate(late);
+
+        return messages.stream()
+                .map(message -> new MessageCreateResponse(
+                        message.getSender().getName(),
+                        message.getReceiver().getName(),
+                        message.getContent(),
+                        message.getAttachment(),
+                        message.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<PayCreateResponse> getPayList(Long lateId) {
+        Late late = lateService.findLateByIdOrThrow(lateId);
+        List<Pay> pays = payRepository.findByLate(late);
+
+        return pays.stream()
+                .map(pay -> new PayCreateResponse(
+                        pay.getSender().getName(),
+                        pay.getReceiver().getName(),
+                        pay.getEnvelope(),
+                        pay.getAmount(),
+                        pay.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+    }
+
 }
