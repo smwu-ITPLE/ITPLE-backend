@@ -34,4 +34,7 @@ public class Owner {
 
     @OneToMany(mappedBy = "receiver")
     private List<Message> messages;
+
+    @OneToMany(mappedBy = "receiver")
+    private List<Pay> pays;
 }
