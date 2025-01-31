@@ -72,7 +72,7 @@ public class LateService {
 
 
     // 프로필 파일 저장
-    private String saveProfileFile(MultipartFile profileFile) throws IOException {
+    protected String saveProfileFile(MultipartFile profileFile) throws IOException {
         // 파일이 비어 있는지 확인
         if (profileFile == null || profileFile.isEmpty()) {
             return null; // 프로필 파일이 없으면 null 반환
