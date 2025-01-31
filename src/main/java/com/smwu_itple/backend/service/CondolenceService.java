@@ -48,7 +48,6 @@ public class CondolenceService {
 
         messageRepository.save(message);
         return new MessageCreateResponse(
-                lateId,
                 sender.getName(),
                 receiver.getName(),
                 message.getContent(),
@@ -72,7 +71,6 @@ public class CondolenceService {
 
         payRepository.save(pay);
         return new PayCreateResponse(
-                lateId,
                 sender.getName(),
                 receiver.getName(),
                 pay.getEnvelope(),

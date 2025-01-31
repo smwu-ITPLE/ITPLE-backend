@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 public class MessageCreateResponse {
-    private Long lateId;
     private String senderName;
     private String receiverName;
     private String content;
