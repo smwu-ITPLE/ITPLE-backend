@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class LateCreateResponse {
+    private Long id;
     private String name;
     private String profile; // 파일 경로
 }

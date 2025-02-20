@@ -55,12 +55,7 @@ public class LateController {
     public ResponseEntity<ApiResponse> searchLate(@RequestBody LateSearchRequest lateSearchRequest) {
         try {
             Late late = lateService.searchLate(lateSearchRequest);
-
-            // 응답에 조문공간 URL 포함
-            String lateUrl = "/api/lates/" + late.getId();
-            return ApiResponse.onSuccess(Map.of(
-                    "url", lateUrl // 페이지 접근 URL
-            ), SuccessStatus._SEARCH_LATE_SUCCESS);
+            return ApiResponse.onSuccess(late.getId(), SuccessStatus._SEARCH_LATE_SUCCESS);
         } catch (IllegalArgumentException e) {
             return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
         }
