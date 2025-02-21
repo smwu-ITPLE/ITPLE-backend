@@ -67,7 +67,7 @@ public class LateService {
         late.setOwners(owners);
 
         lateRepository.save(late);
-        return new LateCreateResponse(late.getName(), late.getProfile());
+        return new LateCreateResponse(late.getId(), late.getName(), late.getProfile());
     }
 
 
