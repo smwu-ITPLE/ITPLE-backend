@@ -16,7 +16,9 @@ public enum SuccessStatus {
     _POST_MESSAGE_CREATE_SUCCESS("조문 메시지 전송 성공"),
     _POST_PAY_CREATE_SUCCESS("부의금 전송 성공"),
     _GET_MESSAGELIST_SUCCESS("조문 메시지 리스트 조회 성공"),
-    _GET_PAYLIST_SUCCESS("부의금 리스트 조회 성공");
+    _GET_PAYLIST_SUCCESS("부의금 리스트 조회 성공"),
+    _PAYMENT_READY_SUCCESS("결제 요청 성공"),
+    _PAYMENT_APPROVE_SUCCESS("결제 처리 성공");
 
     private final String message;
 
