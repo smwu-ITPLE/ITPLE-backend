@@ -33,3 +33,7 @@ logging:
         security: DEBUG
         web: DEBUG
         oauth2: DEBUG
+
+kakaopay :
+  secretKey : "DEV1E4CA68D7F1F8B36B8EEC8ADFEC88FDD4A324"
+  cid : "TC0ONETIME"
