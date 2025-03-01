@@ -95,6 +95,7 @@ public class LateController {
         }
     }
 
+    //조문메시지 작성
     @PostMapping(value = "/{lateId}/message", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse> createMessage(@PathVariable Long lateId,
                                                      @RequestPart(value = "attachment", required = false) MultipartFile attachment, // 사진 파일
@@ -102,7 +103,7 @@ public class LateController {
                                                      HttpSession session) {
         try {
             Long senderId = SessionUtil.getUserIdFromSession(session);
-            MessageCreateResponse response = manageService.createMessage(lateId, senderId, attachment, messagecreateRequest);
+            MessageCreateResponse response = lateService.createMessage(lateId, senderId, attachment, messagecreateRequest);
             return ApiResponse.onSuccess(response, SuccessStatus._POST_MESSAGE_CREATE_SUCCESS);
         } catch (UnauthorizedException e) {
             return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
@@ -111,13 +112,14 @@ public class LateController {
         }
     }
 
+    //조의금 전송
     @PostMapping("/{lateId}/pay")
     public ResponseEntity<ApiResponse> CreatePay(@PathVariable Long lateId,
                                                  @RequestBody PayCreateRequest paycreateRequest,
                                                  HttpSession session){
         try {
             Long senderId = SessionUtil.getUserIdFromSession(session);
-            PayCreateResponse response = manageService.createPay(lateId, senderId, paycreateRequest);
+            PayCreateResponse response = lateService.createPay(lateId, senderId, paycreateRequest);
             return ApiResponse.onSuccess(response, SuccessStatus._POST_PAY_CREATE_SUCCESS);
         } catch (UnauthorizedException e) {
             return ApiResponse.onFailure(null, FailureStatus._UNAUTHORIZED, e.getMessage());
