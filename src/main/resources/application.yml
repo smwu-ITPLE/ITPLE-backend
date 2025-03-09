@@ -4,9 +4,17 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/maeumgil?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://ec2-52-79-243-34.ap-northeast-2.compute.amazonaws.com:3306/maeumgil?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: spring
     password: Spring1234!
+
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000  # 5분
+      max-lifetime: 1800000  # 30분
+      keepalive-time: 300000  # 5분마다 연결 유지
+
 
   jpa:
     properties:
@@ -15,16 +23,32 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
-    database-platform: org.hibernate.dialect.MySQLDialect
 
-    servlet:
-      multipart:
-        enabled: true
-        max-file-size: 10MB
-        max-request-size: 10MB
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2GB
+      max-request-size: 2GB
 
 server:
+  tomcat:
+    max-swallow-size: -1
+    max-http-form-post-size: -1
   port: 8081
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${ACCESS-KEY}
+      secret-key: ${SECRET-KEY}
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: maeumgil
+    stack:
+      auto: false
 
 logging:
   level:
