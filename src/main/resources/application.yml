@@ -41,8 +41,8 @@ server:
 cloud:
   aws:
     credentials:
-      access-key: ${ACCESS-KEY}
-      secret-key: ${SECRET-KEY}
+      access-key: ${ACCESS_KEY}
+      secret-key: ${SECRET_KEY}
     region:
       static: ap-northeast-2
     s3:
