@@ -35,7 +35,7 @@ public class LateController {
     // 조문공간 생성
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse> createLate(
-            @RequestPart("profile") MultipartFile profileFile, // 사진 파일
+            @RequestPart(value = "profile", required = false) MultipartFile profileFile, // 사진 파일
             @RequestPart("data") LateCreateRequest lateCreateRequest, // JSON 데이터
             HttpSession session
     ) {
