@@ -29,6 +29,39 @@ public class ManageService {
     private final LateService lateService;
     private final UserService userService;
 
+    //나의 기록 - 조문메시지 조회
+    public List<MessageCreateResponse> readMessagelist(Long userId){
+        User user = userService.findUserByIdOrThrow(userId);
+        List<Message> messages = messageRepository.findBySender(user);
+
+        return messages.stream()
+                .map(message -> new MessageCreateResponse(
+                        message.getSender().getName(),
+                        message.getReceiver().getName(),
+                        message.getContent(),
+                        message.getAttachment(),
+                        message.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    //나의 기록 - 조의금 조회
+    public List<PayCreateResponse> readPaylist(Long userId) {
+        User user = userService.findUserByIdOrThrow(userId);
+        List<Pay> pays = payRepository.findBySender(user);
+
+        return pays.stream()
+                .map(pay -> new PayCreateResponse(
+                        pay.getSender().getName(),
+                        pay.getReceiver().getName(),
+                        pay.getEnvelope(),
+                        pay.getAmount(),
+                        pay.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
     //상주로 있는 조문공간 리스트
     public List<LateSimpleResponse> getLatelist(Long userId){
         List<Owner> owners = ownerRepository.findByUserId(userId);

@@ -21,6 +21,30 @@ import java.util.List;
 public class ManageController {
     private final ManageService manageService;
 
+    //나의 기록 - 메시지 조회
+    @GetMapping("/message")
+    public ResponseEntity<ApiResponse> readMessagelist(HttpSession session) {
+        try {
+            Long userId = SessionUtil.getUserIdFromSession(session);
+            List<MessageCreateResponse> response = manageService.readMessagelist(userId);
+            return ApiResponse.onSuccess(response, SuccessStatus._GET_MESSAGELIST_SUCCESS);
+        } catch (Exception e) {
+            return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
+        }
+    }
+
+    //나의 기록 - 조의금 조회
+    @GetMapping("/pay")
+    public ResponseEntity<ApiResponse> readPaylist(HttpSession session) {
+        try {
+            Long userId = SessionUtil.getUserIdFromSession(session);
+            List<PayCreateResponse> response = manageService.readPaylist(userId);
+            return ApiResponse.onSuccess(response, SuccessStatus._GET_PAYLIST_SUCCESS);
+        } catch (Exception e) {
+            return ApiResponse.onFailure(null, FailureStatus._NOT_FOUND, e.getMessage());
+        }
+    }
+
     //상주로 있는 조문공간 리스트
     @GetMapping("/latelist")
     public ResponseEntity<ApiResponse> getLatelist(HttpSession session){
