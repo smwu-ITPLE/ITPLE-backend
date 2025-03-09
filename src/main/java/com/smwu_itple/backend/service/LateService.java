@@ -34,6 +34,7 @@ public class LateService {
 
     private final UserService userService;
     private final OwnerService ownerService;
+    private final S3Service s3Service;
 
     // 랜덤 비밀번호 생성
     private String generateRandomPassword() {
@@ -46,7 +47,7 @@ public class LateService {
     @Transactional
     public LateCreateResponse createLate(MultipartFile profileFile, LateCreateRequest lateCreateRequest) throws IOException {
 
-        String profilePath = saveProfileFile(profileFile);
+        String profilePath = s3Service.uploadFile(profileFile);
 
         // Late 엔티티 생성
         Late late = new Late();
@@ -68,27 +69,6 @@ public class LateService {
 
         lateRepository.save(late);
         return new LateCreateResponse(late.getId(), late.getName(), late.getProfile());
-    }
-
-
-    // 프로필 파일 저장
-    protected String saveProfileFile(MultipartFile profileFile) throws IOException {
-        // 파일이 비어 있는지 확인
-        if (profileFile == null || profileFile.isEmpty()) {
-            return null; // 프로필 파일이 없으면 null 반환
-        }
-
-        String uploadDir = System.getProperty("user.dir") + "/uploads";
-        File directory = new File(uploadDir);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-
-        String uniqueFileName = UUID.randomUUID() + "_" + profileFile.getOriginalFilename();
-        File savedFile = new File(directory, uniqueFileName);
-        profileFile.transferTo(savedFile);
-
-        return savedFile.getAbsolutePath();
     }
 
     //상주 생성
@@ -117,6 +97,10 @@ public class LateService {
     @Transactional
     public void deleteLate(Long lateId) {
         Late late = findLateByIdOrThrow(lateId);
+        if (late.getProfile() != null) {
+            s3Service.deleteFile(late.getProfile()); //S3에서 삭제
+        }
+
         // 삭제 수행
         lateRepository.deleteById(lateId);
     }
@@ -174,7 +158,7 @@ public class LateService {
         User sender = userService.findUserByIdOrThrow(senderId);
         Owner receiver = ownerService.findOwnerByIdOrThrow(messageCreateRequest.getReceiverId());
 
-        String profilePath = saveProfileFile(attachment);
+        String profilePath = s3Service.uploadFile(attachment);
 
         Message message = new Message();
         message.setLate(late);
