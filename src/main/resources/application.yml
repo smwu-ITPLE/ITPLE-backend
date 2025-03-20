@@ -4,7 +4,7 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://ec2-43-201-65-190.ap-northeast-2.compute.amazonaws.com:3306/maeumgil?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://ec2-15-164-102-9.ap-northeast-2.compute.amazonaws.com:3306/maeumgil?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: spring
     password: Spring1234!
 
