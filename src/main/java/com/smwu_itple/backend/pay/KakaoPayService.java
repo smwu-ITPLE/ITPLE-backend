@@ -7,6 +7,7 @@ import com.smwu_itple.backend.pay.dto.KakaoReadyRequest;
 import com.smwu_itple.backend.pay.dto.KakaoReadyResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,42 +84,48 @@ public class KakaoPayService {
 
     /** 결제 승인 요청 */
     public KakaoApproveResponse kakaoPayApprove(KakaoApproveRequest request) {
-        Payment payment = paymentRepository.findByPartnerOrderId(request.getOrderId())
-                .orElseThrow(() -> new IllegalStateException("결제 준비 정보를 찾을 수 없습니다. orderId: " + request.getOrderId()));
+        try {
+            Payment payment = paymentRepository.findByPartnerOrderId(request.getOrderId())
+                    .orElseThrow(() -> new IllegalStateException("결제 준비 정보를 찾을 수 없습니다. orderId: " + request.getOrderId()));
 
-        if (!payment.isReady()) {
-            throw new IllegalStateException("이미 처리된 결제");
+            if (!payment.isReady()) {
+                throw new IllegalStateException("이미 처리된 결제");
+            }
+
+            Map<String, String> parameters = new HashMap<>();
+            parameters.put("cid", payProperties.getCid());
+            parameters.put("tid", payment.getTid());
+            parameters.put("partner_order_id", request.getOrderId());
+            parameters.put("partner_user_id", request.getUserId());
+            parameters.put("pg_token", request.getPgToken());
+
+            HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
+            KakaoApproveResponse response = restTemplate.postForObject(
+                    "https://open-api.kakaopay.com/online/v1/payment/approve",
+                    requestEntity, KakaoApproveResponse.class);
+
+            if (response == null) {
+                payment.fail();
+                throw new IllegalStateException("카카오페이 승인 응답이 없습니다.");
+            }
+
+            // 금액 검증: 카카오 응답 금액 vs DB 저장 금액
+            int confirmedAmount = response.getAmount().getTotal();
+            if (confirmedAmount != payment.getAmount()) {
+                payment.fail();
+                throw new IllegalStateException(
+                        "결제 금액 불일치. 예상: " + payment.getAmount() + ", 실제: " + confirmedAmount);
+            }
+
+            payment.approve();
+            log.info("결제 승인 완료 - orderId: {}, tid: {}", request.getOrderId(), payment.getTid());
+
+            return response;
         }
-
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("cid", payProperties.getCid());
-        parameters.put("tid", payment.getTid());
-        parameters.put("partner_order_id", request.getOrderId());
-        parameters.put("partner_user_id", request.getUserId());
-        parameters.put("pg_token", request.getPgToken());
-
-        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
-        KakaoApproveResponse response = restTemplate.postForObject(
-                "https://open-api.kakaopay.com/online/v1/payment/approve",
-                requestEntity, KakaoApproveResponse.class);
-
-        if (response == null) {
-            payment.fail();
-            throw new IllegalStateException("카카오페이 승인 응답이 없습니다.");
+        catch (OptimisticLockingFailureException e) {
+            log.warn("동시성 충돌 발생 - orderId: {}", request.getOrderId());
+            throw new IllegalStateException("동시에 처리된 결제입니다. 다시 시도해주세요.");
         }
-
-        // 금액 검증: 카카오 응답 금액 vs DB 저장 금액
-        int confirmedAmount = response.getAmount().getTotal();
-        if (confirmedAmount != payment.getAmount()) {
-            payment.fail();
-            throw new IllegalStateException(
-                    "결제 금액 불일치. 예상: " + payment.getAmount() + ", 실제: " + confirmedAmount);
-        }
-
-        payment.approve();
-        log.info("결제 승인 완료 - orderId: {}, tid: {}", request.getOrderId(), payment.getTid());
-
-        return response;
     }
 
     /** 결제 취소 처리 */

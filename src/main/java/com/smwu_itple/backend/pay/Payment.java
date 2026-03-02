@@ -29,6 +29,9 @@ public class Payment {
     @Column(nullable = false)
     private PaymentStatus status;
 
+    @Version
+    private Long version;
+
     private String redirectPcUrl;      // ready 멱등성 응답용
 
     @Column(nullable = false)
