@@ -26,8 +26,13 @@ public class KakaoPayController {
     }
 
     /** 결제 성공 처리 */
-    @PostMapping("/success")
-    public ResponseEntity<ApiResponse> afterPayRequest(@RequestBody KakaoApproveRequest request) {
+    @GetMapping("/success")
+    public ResponseEntity<ApiResponse> success(
+            @RequestParam String pg_token,
+            @RequestParam String orderId) {
+
+        KakaoApproveRequest request = new KakaoApproveRequest(orderId, "user1", pg_token);
+
         KakaoApproveResponse response = kakaoPayService.kakaoPayApprove(request);
         return ApiResponse.onSuccess(response, SuccessStatus._PAYMENT_APPROVE_SUCCESS);
     }

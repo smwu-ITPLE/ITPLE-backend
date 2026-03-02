@@ -29,24 +29,37 @@ public class Payment {
     @Column(nullable = false)
     private PaymentStatus status;
 
+    private String redirectPcUrl;      // ready 멱등성 응답용
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    public static Payment ofReady(String partnerOrderId, String tid, int amount) {
+    public static Payment ofReady(String partnerOrderId, String tid, int amount, String redirectPcUrl) {
         Payment payment = new Payment();
         payment.partnerOrderId = partnerOrderId;
         payment.tid = tid;
         payment.amount = amount;
+        payment.redirectPcUrl = redirectPcUrl;
         payment.status = PaymentStatus.READY;
         payment.createdAt = LocalDateTime.now();
         return payment;
     }
 
+    public boolean isReady() {
+        return this.status == PaymentStatus.READY;
+    }
+
     public void approve() {
+        if (this.status != PaymentStatus.READY) {
+            throw new IllegalStateException("승인 불가능한 상태");
+        }
         this.status = PaymentStatus.APPROVED;
     }
 
     public void cancel() {
+        if (this.status != PaymentStatus.READY) {
+            throw new IllegalStateException("취소 불가능한 상태");
+        }
         this.status = PaymentStatus.CANCEL;
     }
 
