@@ -4,9 +4,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://ec2-15-164-102-9.ap-northeast-2.compute.amazonaws.com:3306/maeumgil?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: spring
-    password: Spring1234!
+    url: jdbc:mysql://localhost:3306/maeumgil
+    username: root
+    password: 1234
 
     hikari:
       maximum-pool-size: 20

@@ -1,6 +1,6 @@
 package com.smwu_itple.backend;
 
-import com.smwu_itple.backend.dto.KakaoPayProperties;
+import com.smwu_itple.backend.pay.dto.KakaoPayProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
