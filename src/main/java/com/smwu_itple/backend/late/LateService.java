@@ -1,0 +1,244 @@
+package com.smwu_itple.backend.late;
+
+import com.smwu_itple.backend.archive.Archive;
+import com.smwu_itple.backend.archive.ArchiveRepository;
+import com.smwu_itple.backend.archive.dto.ArchiveDto;
+//import com.smwu_itple.backend.file.S3Service;
+import com.smwu_itple.backend.late.dto.LateCreateRequest;
+import com.smwu_itple.backend.late.dto.LateCreateResponse;
+import com.smwu_itple.backend.late.dto.LateGetResponse;
+import com.smwu_itple.backend.late.dto.LateOwnerResponse;
+import com.smwu_itple.backend.late.dto.LateSearchRequest;
+import com.smwu_itple.backend.message.Message;
+import com.smwu_itple.backend.message.MessageRepository;
+import com.smwu_itple.backend.message.dto.MessageCreateRequest;
+import com.smwu_itple.backend.message.dto.MessageCreateResponse;
+import com.smwu_itple.backend.owner.Owner;
+import com.smwu_itple.backend.owner.OwnerService;
+import com.smwu_itple.backend.owner.dto.OwnerDto;
+import com.smwu_itple.backend.pay.Pay;
+import com.smwu_itple.backend.pay.PayRepository;
+import com.smwu_itple.backend.pay.dto.PayCreateRequest;
+import com.smwu_itple.backend.pay.dto.PayCreateResponse;
+import com.smwu_itple.backend.user.User;
+import com.smwu_itple.backend.user.UserRepository;
+import com.smwu_itple.backend.user.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class LateService {
+    private final LateRepository lateRepository;
+    private final UserRepository userRepository;
+    private final ArchiveRepository archiveRepository;
+    private final MessageRepository messageRepository;
+    private final PayRepository payRepository;
+
+    private final UserService userService;
+    private final OwnerService ownerService;
+//    private final S3Service s3Service;
+
+    // 랜덤 비밀번호 생성
+    private String generateRandomPassword() {
+        SecureRandom random = new SecureRandom();
+        int password = 100000 + random.nextInt(900000); // 6자리 숫자 생성
+        return String.valueOf(password);
+    }
+
+    //조문공간 생성
+    @Transactional
+    public LateCreateResponse createLate(MultipartFile profileFile, LateCreateRequest lateCreateRequest) throws IOException {
+
+        String profilePath = "";
+                //s3Service.uploadFile(profileFile);
+
+        // Late 엔티티 생성
+        Late late = new Late();
+        late.setName(lateCreateRequest.getName());
+        late.setProfile(profilePath);
+        late.setAge(lateCreateRequest.getAge());
+        late.setGender(lateCreateRequest.getGender());
+        late.setDatePass(lateCreateRequest.getDatePass());
+        late.setDateDeath(lateCreateRequest.getDateDeath());
+        late.setLocation(lateCreateRequest.getLocation());
+        late.setContent(lateCreateRequest.getContent());
+        late.setPasswd(generateRandomPassword());
+
+        // 상주 정보 설정
+        List<Owner> owners = lateCreateRequest.getOwners().stream()
+                .map(ownerRequest -> createOwner(ownerRequest, late))
+                .collect(Collectors.toList());
+        late.setOwners(owners);
+
+        lateRepository.save(late);
+        return new LateCreateResponse(late.getId(), late.getName(), late.getProfile());
+    }
+
+    //상주 생성
+    private Owner createOwner(Owner ownerResponse, Late late) {
+        User ownerUser = userRepository.findByPhonenumber(ownerResponse.getPhoneNumber())
+                .orElseThrow(() -> new IllegalArgumentException("상주의 전화번호를 찾을 수 없습니다: " + ownerResponse.getPhoneNumber()));
+
+        Owner owner = new Owner();
+        owner.setName(ownerResponse.getName());
+        owner.setRelation(ownerResponse.getRelation());
+        owner.setPhoneNumber(ownerResponse.getPhoneNumber());
+        owner.setUser(ownerUser);
+        owner.setLate(late);
+
+        return owner;
+    }
+
+    //조문공간 검색
+    public Late searchLate(LateSearchRequest lateSearchRequest) {
+        return lateRepository.findByNameAndPasswd(lateSearchRequest.getName(), lateSearchRequest.getPasswd())
+                .orElseThrow(() -> new IllegalArgumentException("조문공간이 존재하지 않거나 비밀번호가 일치하지 않습니다."));
+    }
+
+
+    // 특정 조문공간 삭제
+    @Transactional
+    public void deleteLate(Long lateId) {
+        Late late = findLateByIdOrThrow(lateId);
+//        if (late.getProfile() != null) {
+//            s3Service.deleteFile(late.getProfile()); //S3에서 삭제
+//        }
+
+        // 삭제 수행
+        lateRepository.deleteById(lateId);
+    }
+
+    //조문공간 조회
+    public LateGetResponse findLate(Long lateId) {
+        Late late = findLateByIdOrThrow(lateId);
+
+        // Owner를 OwnerResponse로 변환
+        List<OwnerDto> ownerDto = late.getOwners().stream()
+                .map(owner -> new OwnerDto(
+                        owner.getName(),
+                        owner.getRelation(),
+                        owner.getPhoneNumber()
+                ))
+                .collect(Collectors.toList());
+
+        List<ArchiveDto> archiveDto = late.getArchives().stream()
+                .map(archive -> new ArchiveDto(
+                        archive.getNickname(),
+                        archive.getContent()
+                ))
+                .collect(Collectors.toList());
+
+
+        // Late를 LateGetResponse로 변환
+        return new LateGetResponse(
+                late.getName(),
+                late.getProfile(),
+                late.getAge(),
+                late.getGender(),
+                late.getDatePass(),
+                late.getDateDeath(),
+                late.getLocation(),
+                ownerDto,
+                archiveDto
+        );
+    }
+
+    //조문공간 상주 조회
+    public List<LateOwnerResponse> getLateOwner(Long lateId) {
+        Late late = findLateByIdOrThrow(lateId);
+
+        List<LateOwnerResponse> lateOwnerResponses = late.getOwners().stream()
+                .map(owner -> new LateOwnerResponse(owner.getId(), owner.getName()))
+                .collect(Collectors.toList());
+
+        return lateOwnerResponses;
+    }
+
+    //조문 메시지 전송
+    @Transactional
+    public MessageCreateResponse createMessage(Long lateId, Long senderId, MultipartFile attachment, MessageCreateRequest messageCreateRequest) throws IOException {
+        Late late = findLateByIdOrThrow(lateId);
+        User sender = userService.findUserByIdOrThrow(senderId);
+        Owner receiver = ownerService.findOwnerByIdOrThrow(messageCreateRequest.getReceiverId());
+
+        String profilePath = "";
+                //s3Service.uploadFile(attachment);
+
+        Message message = new Message();
+        message.setLate(late);
+        message.setSender(sender);
+        message.setReceiver(receiver);
+        message.setCreatedAt(LocalDateTime.now());
+        message.setAttachment(profilePath);
+
+        //내용이 있을 경우 저장
+        if (messageCreateRequest.getContent() != null) {
+            message.setContent(messageCreateRequest.getContent());
+        }
+
+        messageRepository.save(message);
+        return new MessageCreateResponse(
+                sender.getName(),
+                receiver.getName(),
+                message.getContent(),
+                message.getAttachment(),
+                message.getCreatedAt()
+        );
+    }
+
+    //조문 부의금 송금
+    @Transactional
+    public PayCreateResponse createPay(Long lateId, Long senderId, PayCreateRequest payCreateRequest) throws IOException {
+        Late late = findLateByIdOrThrow(lateId);
+        User sender = userService.findUserByIdOrThrow(senderId);
+        Owner receiver = ownerService.findOwnerByIdOrThrow(payCreateRequest.getReceiverId());
+
+        Pay pay = new Pay();
+        pay.setLate(late);
+        pay.setSender(sender);
+        pay.setReceiver(receiver);
+        pay.setEnvelope(payCreateRequest.getEnvelope());
+        pay.setAmount(payCreateRequest.getAmount());
+        pay.setCreatedAt(LocalDateTime.now());
+
+        payRepository.save(pay);
+        return new PayCreateResponse(
+                sender.getName(),
+                receiver.getName(),
+                pay.getEnvelope(),
+                pay.getAmount(),
+                pay.getCreatedAt()
+        );
+    }
+
+    //아카이브 작성
+    @Transactional
+    public ArchiveDto createArchive(Long lateId, ArchiveDto archiveRequest){
+        Late late = findLateByIdOrThrow(lateId);
+        Archive archive = new Archive();
+        archive.setNickname(archiveRequest.getNickname());
+        archive.setContent(archiveRequest.getContent());
+        archive.setLate(late);
+
+        archiveRepository.save(archive);
+        return new ArchiveDto(
+                archive.getNickname(),
+                archive.getContent()
+        );
+    }
+
+    public Late findLateByIdOrThrow(Long lateId) {
+        return lateRepository.findById(lateId)
+                .orElseThrow(() -> new IllegalArgumentException("조문공간이 존재하지 않습니다."));
+    }
+}
