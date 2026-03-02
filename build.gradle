@@ -57,6 +57,6 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-tasks.withType(Test) {
-	enabled = false
-}
+//tasks.withType(Test) {
+//	enabled = false
+//}
