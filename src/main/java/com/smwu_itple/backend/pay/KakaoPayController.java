@@ -21,35 +21,28 @@ public class KakaoPayController {
     /** 결제 요청 */
     @PostMapping(value = "/ready", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse> readyToKakaoPay(@RequestBody KakaoReadyRequest request) {
-        try {
-            KakaoReadyResponse response = kakaoPayService.kakaoPayReady(request);
-            return ApiResponse.onSuccess(response, SuccessStatus._PAYMENT_READY_SUCCESS);
-        } catch (Exception e) {
-            return ApiResponse.onFailure(null, FailureStatus._BAD_REQUEST, e.getMessage());
-        }
+        KakaoReadyResponse response = kakaoPayService.kakaoPayReady(request);
+        return ApiResponse.onSuccess(response, SuccessStatus._PAYMENT_READY_SUCCESS);
     }
-
 
     /** 결제 성공 처리 */
     @PostMapping("/success")
     public ResponseEntity<ApiResponse> afterPayRequest(@RequestBody KakaoApproveRequest request) {
-        try {
-            KakaoApproveResponse response = kakaoPayService.kakaoPayApprove(request);
-            return ApiResponse.onSuccess(response, SuccessStatus._PAYMENT_APPROVE_SUCCESS);
-        } catch (Exception e) {
-            return ApiResponse.onFailure(null, FailureStatus._BAD_REQUEST, e.getMessage());
-        }
+        KakaoApproveResponse response = kakaoPayService.kakaoPayApprove(request);
+        return ApiResponse.onSuccess(response, SuccessStatus._PAYMENT_APPROVE_SUCCESS);
     }
 
     /** 결제 취소 */
     @GetMapping("/cancel")
-    public ResponseEntity<ApiResponse> cancel() {
+    public ResponseEntity<ApiResponse> cancel(@RequestParam(required = false) String orderId) {
+        kakaoPayService.kakaoPayCancel(orderId);
         return ApiResponse.onFailure(null, FailureStatus._BAD_REQUEST, "결제가 취소되었습니다.");
     }
 
     /** 결제 실패 */
     @GetMapping("/fail")
-    public ResponseEntity<ApiResponse> fail() {
+    public ResponseEntity<ApiResponse> fail(@RequestParam(required = false) String orderId) {
+        kakaoPayService.kakaoPayFail(orderId);
         return ApiResponse.onFailure(null, FailureStatus._BAD_REQUEST, "결제가 실패하였습니다.");
     }
 }

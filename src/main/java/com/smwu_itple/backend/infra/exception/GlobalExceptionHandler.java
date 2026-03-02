@@ -1,5 +1,7 @@
 package com.smwu_itple.backend.infra.exception;
 
+import com.smwu_itple.backend.infra.api.ApiResponse;
+import com.smwu_itple.backend.infra.api.FailureStatus;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +28,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .header("Content-Type", "application/json; charset=UTF-8")
                 .body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse> handleBusiness(Exception e) {
+        return ApiResponse.onFailure(null, FailureStatus._BAD_REQUEST, e.getMessage());
     }
 }
