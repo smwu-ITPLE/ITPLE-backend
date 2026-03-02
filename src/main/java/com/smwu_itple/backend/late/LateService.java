@@ -3,7 +3,7 @@ package com.smwu_itple.backend.late;
 import com.smwu_itple.backend.archive.Archive;
 import com.smwu_itple.backend.archive.ArchiveRepository;
 import com.smwu_itple.backend.archive.dto.ArchiveDto;
-import com.smwu_itple.backend.file.S3Service;
+//import com.smwu_itple.backend.file.S3Service;
 import com.smwu_itple.backend.late.dto.LateCreateRequest;
 import com.smwu_itple.backend.late.dto.LateCreateResponse;
 import com.smwu_itple.backend.late.dto.LateGetResponse;
@@ -46,7 +46,7 @@ public class LateService {
 
     private final UserService userService;
     private final OwnerService ownerService;
-    private final S3Service s3Service;
+//    private final S3Service s3Service;
 
     // 랜덤 비밀번호 생성
     private String generateRandomPassword() {
@@ -59,7 +59,8 @@ public class LateService {
     @Transactional
     public LateCreateResponse createLate(MultipartFile profileFile, LateCreateRequest lateCreateRequest) throws IOException {
 
-        String profilePath = s3Service.uploadFile(profileFile);
+        String profilePath = "";
+                //s3Service.uploadFile(profileFile);
 
         // Late 엔티티 생성
         Late late = new Late();
@@ -109,9 +110,9 @@ public class LateService {
     @Transactional
     public void deleteLate(Long lateId) {
         Late late = findLateByIdOrThrow(lateId);
-        if (late.getProfile() != null) {
-            s3Service.deleteFile(late.getProfile()); //S3에서 삭제
-        }
+//        if (late.getProfile() != null) {
+//            s3Service.deleteFile(late.getProfile()); //S3에서 삭제
+//        }
 
         // 삭제 수행
         lateRepository.deleteById(lateId);
@@ -170,7 +171,8 @@ public class LateService {
         User sender = userService.findUserByIdOrThrow(senderId);
         Owner receiver = ownerService.findOwnerByIdOrThrow(messageCreateRequest.getReceiverId());
 
-        String profilePath = s3Service.uploadFile(attachment);
+        String profilePath = "";
+                //s3Service.uploadFile(attachment);
 
         Message message = new Message();
         message.setLate(late);
